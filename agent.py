@@ -10,23 +10,26 @@ from pdb import set_trace       # For debugging
 # Prompt definition and configuration
 agent_prompt= """
 You are an AI assistant helping in email writing in a polite but concise matter.
-Your task is to create processional replies to emails based on the content of email.
+Your task is to create processional replies to emails based on the content of
+email.
 
-Please output two things: a subject and a body formatted as a python dictionary
-data structure without any headings.
+Please output two things: a subject and a body, the first one in one line and
+the other one next. And please tag them with "Subject:" and "Body:".
 
 Sign the body as follows:
 Best, 
 [Name] [Company]
 """
 def prompt(state: AgentState, config: RunnableConfig) -> list[AnyMessage]:
+    """ Configures the agent to behave in order to write email answers
+    """
     user_name = config["configurable"].get("user_name")
-    past_messages = config["configurable"].get("past_messages")
+    #past_messages = config["configurable"].get("past_messages")
     system_msg = agent_prompt
     return [{"role": "system", "content": system_msg}] + state["messages"]
 
 
-def get_response(body:str, subject:str, sender:str, past_messages:str) -> dict:
+def get_response(body:str, subject:str, sender:str) -> dict:
     # Checkpoint for enabling memory
     checkpointer_0 = InMemorySaver()
 
@@ -50,12 +53,8 @@ def get_response(body:str, subject:str, sender:str, past_messages:str) -> dict:
         # Chat configuration
         config = {"configurable": {"thread_id": "1",
                                    "sender": sender,
-                                   "subject": subject,
-                                   "past_messages": past_messages}}
+                                   "subject": subject}}
     )
 
-    set_trace()
     return response
 
-
-get_response("Hey, do you know how many forgs are in the patio", "Frog count", "Jason", "[]")
